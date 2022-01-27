@@ -4,4 +4,4 @@ engine has:
   resource manager: (shaders, textures, game objects),
   and sprite renderer
 
-... WIP (1/27/2022)
+... WIP (1/27/2022) going to be used for a 2d game.
