@@ -35,7 +35,7 @@ bool Shader::compile(const char* const vsource, const char* const fsource) {
 
 	this->ID = 0;
 	this->ID = glCreateProgram();
-	std::cout << "shader id.x: " << this->ID;
+	std::cout << "shader id.x: " << this->ID << "\n";
 	glAttachShader(this->ID, vshader);
 	glAttachShader(this->ID, fshader);
 	glLinkProgram(this->ID);

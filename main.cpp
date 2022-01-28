@@ -1,5 +1,5 @@
-#include <GL/glew.h>    /* include GLEW and new version of GL on Windows */
-#include <GLFW/glfw3.h> /* GLFW helper library */
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -48,7 +48,10 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+        game.calcTime();
+
         processInput(window);
+        glfwPollEvents();
         game.processInput();
 
         game.update();
@@ -59,7 +62,6 @@ int main()
         game.render();
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
     }
 
     ResourceManager::clear();
