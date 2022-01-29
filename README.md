@@ -1,6 +1,6 @@
 # 2d_game_engine alpha 0.1.1 (C++/openGL)
 
-[___0.1.1___]:
+[___0.1.2___]:
 
   -added time.h,.cpp for tracking sync'd game time, added drawText to sprite renderer
 
