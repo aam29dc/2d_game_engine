@@ -24,7 +24,7 @@ public:
 	const unsigned int cell_w;
 	const unsigned int cell_h;
 
-	Object(const unsigned int frames, const unsigned int width, const unsigned int height);
+	Object(const unsigned int width, const unsigned int height);
 	~Object();
 
 	void print() const {

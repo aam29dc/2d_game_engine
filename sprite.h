@@ -4,6 +4,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "object.h"
+#include "time.h"
 #include <glm/glm.hpp>
 
 #ifndef NULL
@@ -31,7 +32,8 @@ public:
 
 	void initRenderData();
 	void drawSprite(const Texture2D& texture, const glm::vec2 pos, const glm::vec2 size, const float rotate, const glm::vec3 color = glm::vec3(1,1,1));
-	void drawObject(Object animate);
+	void drawText(Object& animate, const char* const text, const float offsetX, const float offsetY);
+	void drawObject(Object& animate);
 };
 
 #endif

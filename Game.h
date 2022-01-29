@@ -4,6 +4,7 @@
 #include "resource_manager.h"
 #include "sprite.h"
 #include "utility.h"
+#include "time.h"
 
 enum GameState {
 	MENU = 0,
@@ -16,7 +17,7 @@ public:
 	GameState State;
 	int _width, _height;
 	char _keys[100] = { 0 };
-	float currentTime, lastTime, deltaTime;
+	//Time time;
 
 	Game(const unsigned int w, const unsigned int h);
 	~Game();
@@ -25,7 +26,6 @@ public:
 	void processInput();
 	void update();
 	void render();
-	void calcTime();
 };
 
 #endif

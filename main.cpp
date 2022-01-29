@@ -48,7 +48,7 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-        game.calcTime();
+        Time::calc();
 
         processInput(window);
         glfwPollEvents();

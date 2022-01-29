@@ -96,40 +96,44 @@ void Sprite::drawSprite(const Texture2D &texture, const glm::vec2 pos, const glm
 
 void Sprite::calcTextureCoords(Object& animate, GLfloat (*tc)[TC_SIZE]) {
     /*
-        animate.cell_w
-        animate.cell_h
-        animate.image.width
-        animate.image.height;
-        animate.frame
+        animate.cell_w = cols;
+        animate.cell_h = rows;
+        animate.frame = index;
     */
+    //reset coords
+    for (int i = 0; i < TC_SIZE; i++) {
+        (*tc)[i] = n_tc[i];
+    }
 
     //scale
     for (int i = 0; i < TC_SIZE; i++) {
-        if (i % 2 == 0) (*tc)[i] /= (float)animate.cell_w;
-        else (*tc)[i] /= (float)animate.cell_h;
+        if (i % 2 == 0) (*tc)[i] /= (float)animate.cell_w;  //x
+        else (*tc)[i] /= (float)animate.cell_h;             //y
     }
 
     //translate
-    const unsigned int col = animate.frame % animate.cell_w;
-    const unsigned int row = (unsigned int)(animate.frame / animate.cell_w);
+    if (animate.cell_w != 0) {
+        const unsigned int col = animate.frame % animate.cell_w;
+        const unsigned int row = (unsigned int)(animate.frame / animate.cell_w);
 
-    if (animate.frame != 0) {
-        for (int i = 0; i < TC_SIZE; i++) {
-            if (i % 2 == 0) (*tc)[i] += (float)col * (1.0f / (float)animate.cell_w);
-            else (*tc)[i] += (float)row * (1.0f / (float)animate.cell_h);
+        if (animate.frame != 0) {
+            for (int i = 0; i < TC_SIZE; i++) {
+                if (i % 2 == 0) (*tc)[i] += (float)col * (1.0f / (float)animate.cell_w);    //x
+                else (*tc)[i] += (float)row * (1.0f / (float)animate.cell_h);               //y
+            }
         }
     }
 }
 
-void Sprite::drawObject(Object animate) {
+const glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f);
+
+void Sprite::drawObject(Object& animate) {
     this->shader->Use();
 
     glm::mat4 model = glm::mat4(1.0);
     model *= glm::translate(model, glm::vec3(animate.pos.x, animate.pos.y, 0));
     model *= glm::rotate(model, glm::radians(animate.angle), glm::vec3(0, 0, 1.0));
     model *= glm::scale(model, glm::vec3(animate.size.x, animate.size.y, 1));
-
-    glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f);
 
     this->shader->setMatrix4("model", model, true);
     this->shader->setMatrix4("projection", proj);
@@ -141,19 +145,14 @@ void Sprite::drawObject(Object animate) {
     glBindVertexArray(this->vao);
 
     /* calculate new texture coordiantes buffer */
-    GLfloat tc[TC_SIZE] = { 0, 1,
-                            1, 1,
-                            1, 0,
-                            0, 0 };
-
-    /*GLfloat tc[TC_SIZE] = {0, 0,
-                            0, 1,
-                            1, 1,
-                            1, 0 };*/
+    GLfloat tc[TC_SIZE] = { 0 };
     GLuint vbo_tc;
     glGenBuffers(1, &vbo_tc);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
 
+    if (Time::currentTime == Time::lastTime) {
+        animate.frame++;
+    }
     calcTextureCoords(animate, &tc);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
@@ -162,5 +161,57 @@ void Sprite::drawObject(Object animate) {
     /**/
 
     glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
+void Sprite::drawText(Object& animate, const char* const text, const float offsetX, const float offsetY)  {
+    this->shader->Use();
+
+    glm::mat4 model = glm::mat4(1.0);
+
+    this->shader->setMatrix4("projection", proj, true);
+    this->shader->setVec3f("color", animate.color);
+
+    glActiveTexture(GL_TEXTURE0);
+    animate.image->bind();
+
+    glBindVertexArray(this->vao);
+
+    /* calculate new texture coordiantes buffer */
+    GLfloat tc[TC_SIZE] = { 0 };
+    GLuint vbo_tc;
+    glGenBuffers(1, &vbo_tc);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
+
+    glm::vec3 translate = glm::vec3(0);
+    unsigned int i = 0;
+    unsigned int row = 0;
+
+    for (unsigned int j = 0; text[j] != '\0'; j++) {
+        model = glm::mat4(1.0f);
+        translate = glm::vec3(animate.pos.x + offsetX - 0.5f + animate.size.x / 2.0f + i * animate.size.x, animate.pos.y + offsetY - row*animate.size.y, 0.0f);
+
+        i++;
+
+        if (translate.x >= 0.5 - animate.size.x) {
+            i = 0;
+            row++;
+        }
+
+        model *= glm::translate(model, translate);
+        //model *= glm::rotate(model, glm::radians(0.f), glm::vec3(0.0f, 0.0f, 1.0f));  /*error: rotating matrix does funky stuff*/
+        model *= glm::scale(model, glm::vec3(animate.size.x, animate.size.y, 1.0f));
+
+        this->shader->setMatrix4("model", model, true);
+         
+        animate.frame = (unsigned int)text[j];
+        //std::cout << "text[i]: " << text[j] << ", j: " << j << ", frame: " << animate.frame << "\n";
+        calcTextureCoords(animate, &tc);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
+
+        glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
+    }
     glBindVertexArray(0);
 }
