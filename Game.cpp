@@ -1,40 +1,48 @@
 #include "Game.h"
 
-Sprite *renderer;
-Object *someObject;
-Object* text;
+const float TEXT_SIZE = 0.025f;
+const float TEXT_SMALL = TEXT_SIZE / 2.0f;
+const float TEXT_LARGE = 2.0f * TEXT_SIZE;
 
-Game::Game(const unsigned int w, const unsigned int h) : State((GameState)0), _width(w), _height(h) {
+Game::Game(const unsigned int w, const unsigned int h) : State((GameState)0), _width(w), _height(h), text(Entity(16,16)), entity_count(0) {
 }
 
 Game::~Game() {
-	delete renderer;
+	delete Game::renderer;
+	delete [] Game::entities;
 }
 
-const float TEXT_SIZE = 0.025f;
-const float TEXT_SMALL = TEXT_SIZE/2.0f;
-const float TEXT_LARGE = 2.0f*TEXT_SIZE;
-
 void Game::init() {
+	ResourceManager::Shaders = new Shader[1];
 	ResourceManager::loadShader("C:/Users/user052e/source/repos/glgui/glgui/sprite.vs", "C:/Users/user052e/source/repos/glgui/glgui/sprite.fs");
-	renderer = new Sprite(&ResourceManager::Shaders[0]);
 	std::cout << "shader count: " << Shader::_count << "\n";
 
+	Game::renderer = new Renderer(&ResourceManager::Shaders[0]);
+
+	ResourceManager::Textures = new Texture2D[3];
 	ResourceManager::loadTexture("C:/game/textures/brick.jpg");
 	ResourceManager::loadTexture("C:/game/textures/walk.png", true);
-	ResourceManager::loadTexture("C:/game/textures/grid.jpg");
 	ResourceManager::loadTexture("C:/game/textures/font3.png", true);
 	std::cout << "texture count: " << Texture2D::_count << "\n";
 
-	someObject = new Object(8, 8);
-	someObject->image = &ResourceManager::Textures[1];
-	someObject->print();
+	Game::entities = new Entity[1];
+	Game::entity_count = 1;
 
-	text = new Object(16, 16);
-	text->angle = 0;
-	text->color = glm::vec3(0, 1, 0);
-	text->size = glm::vec2(TEXT_SIZE, TEXT_SIZE);
-	text->image = &ResourceManager::Textures[3];
+	//background
+	Game::entities[0].image = &ResourceManager::Textures[0];
+	Game::entities[0].color = glm::vec3(0.5, 0.5, 0.5);
+
+	Game::players = new Player[1];
+	Game::players[0].cols = 8;
+	Game::players[0].rows = 8;
+	Game::players[0].image = &ResourceManager::Textures[1];
+	Game::players[0].size = glm::vec2(0.25f, 0.25f);
+	Game::players[0].color = glm::vec3(1.0f, 1.0f, 0.0f);
+	Game::players[0].pos = glm::vec2(0, -0.5);
+
+	Game::text.color = glm::vec3(0, 1, 0);
+	Game::text.size = glm::vec2(TEXT_SIZE, TEXT_SIZE);
+	Game::text.image = &ResourceManager::Textures[2];
 }
 
 void Game::processInput() {
@@ -46,20 +54,14 @@ void Game::update() {
 }
 
 void Game::render() {
-	//renderer->drawSprite(ResourceManager::Textures[2], glm::vec2(0,0), glm::vec2(1, 1), 0.0f);
+	for (unsigned int i = 0; i < Game::entity_count; i++) {
+		Game::renderer->drawEntity(entities[i]);
+	}
 
-	/*
-	ct = (float)glfwGetTime();
-    dt = ct - lt;
+	for (unsigned int i = 0; i < Game::players->_count; i++) {
+		Game::renderer->drawEntity(Game::players[i]);
+	}
 
-    if (dt >= 0.5f) {
-        std::cout << ct << " " << dt << " " << lt <<  " " << animate.frame << "\n";
-        if (animate.frame >= animate.maxFrames) animate.frame = 0;
-        lt = ct;
-        animate.frame++;
-    }
-	*/
-
-	renderer->drawObject(*someObject);
-	renderer->drawText(*text, "Hello circus clown, do you know? How do you know that? ... I? Me either. HaHaHaHa", 0, 0);
+	Game::renderer->drawText(text, "Hello circus clown, no questions allowed! Goats are not the meta.", 0, 0);
+	Game::renderer->drawText(text, "This is another run on sentence or I dont know what im talking about?", 0, 0.2f);
 }

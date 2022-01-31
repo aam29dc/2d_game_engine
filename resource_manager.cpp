@@ -3,8 +3,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-Shader ResourceManager::Shaders[MAX_SHADERS];
-Texture2D ResourceManager::Textures[MAX_TEXTURES];
+Shader* ResourceManager::Shaders;
+Texture2D* ResourceManager::Textures;
 
 void ResourceManager::clear() {
 	for (unsigned int i = 0; i < Shader::_count - 1; i++) {

@@ -10,8 +10,8 @@ const unsigned int MAX_TEXTURES = 32;
 
 class ResourceManager {
 public:
-	static Shader Shaders[MAX_SHADERS];
-	static Texture2D Textures[MAX_TEXTURES];
+	static Shader* Shaders;
+	static Texture2D* Textures;
 
 	static void clear();
 	static void loadShader(const char* const vsFile, const char* const fsFile);
