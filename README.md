@@ -1,5 +1,9 @@
 # 2d_game_engine alpha 0.1.2 (C++/openGL)
 
+[___0.1.3___]:
+
+  -added player.h,.cpp, renamed files, and changed class structures
+
 [___0.1.2___]:
 
   -added time.h,.cpp for tracking sync'd game time, added drawText to sprite renderer
