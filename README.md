@@ -1,5 +1,9 @@
 # 2d_game_engine alpha 0.1.3 (C++/openGL)
 
+[___0.1.4___]:
+
+  -added drawPlayer, a sprite animation of a player moving from keyboard input
+
 [___0.1.3___]:
 
   -added player.h,.cpp, renamed files, and changed class structures
