@@ -20,8 +20,10 @@ public:
 	glm::vec3 color;
 	float angle;
 
-	Texture2D* image;
+	float frameTime;
 	unsigned int frame;
+	Texture2D* image;
+
 	unsigned int cols;
 	unsigned int rows;
 

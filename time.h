@@ -2,19 +2,22 @@
 #define TIME_H
 
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 class Time {
 public:
-	static float currentTime;
-	static float lastTime;
-	static float deltaTime;
+	static float current;
+	static float last;
+	static float delta;
 
-	static void calc() {
+	/*static void calc() {
 		currentTime = (float)glfwGetTime();
 		deltaTime = currentTime - lastTime;
-		if (deltaTime >= 1.0f) {
-			lastTime = currentTime;
-		}
+		lastTime = currentTime;
+	}*/
+
+	static void print() {
+		std::cout << "cT: " << current << "\n" << "dT: " << delta << "\n" << "lT: " << last << "\n\n";
 	}
 private:
 	Time();

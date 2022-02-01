@@ -8,6 +8,8 @@ const GLfloat n_tc[TC_SIZE] = { 0, 1,
 
 GLuint n_vbo_tc;
 
+const glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f);
+
 Renderer::Renderer(Shader* shader) : vao(-1) {
     this->shader = shader;
 
@@ -66,8 +68,6 @@ void Renderer::drawQuad(const Texture2D &texture, const glm::vec2 pos, const glm
     model *= glm::rotate(model, glm::radians(rotate), glm::vec3(0, 0, 1.0));
     model *= glm::scale(model, glm::vec3(size.x, size.y, 1));
 
-    glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f);
-
     this->shader->setMatrix4("model", model, true);
     this->shader->setMatrix4("projection", proj);
     this->shader->setVec3f("color", color);
@@ -100,6 +100,7 @@ void Renderer::calcTextureCoords(Entity& animate, GLfloat (*tc)[TC_SIZE]) {
         animate.cell_h = rows;
         animate.frame = index;
     */
+
     //reset coords
     for (int i = 0; i < TC_SIZE; i++) {
         (*tc)[i] = n_tc[i];
@@ -125,9 +126,7 @@ void Renderer::calcTextureCoords(Entity& animate, GLfloat (*tc)[TC_SIZE]) {
     }
 }
 
-const glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f);
-
-void Renderer::drawEntity(Entity& animate) {
+void Renderer::drawEntity(Entity& animate, const bool sprite) {
     this->shader->Use();
 
     glm::mat4 model = glm::mat4(1.0f);
@@ -135,11 +134,8 @@ void Renderer::drawEntity(Entity& animate) {
     model *= glm::rotate(glm::mat4(1.0f), glm::radians(animate.angle), glm::vec3(0, 0, 1));
     model *= glm::scale(glm::mat4(1.0f), glm::vec3(animate.size.x, animate.size.y, 1));
 
-    //std::cout << "rad: " << glm::radians(0.f) << "\n";
-    //std::cout << "Rotation: \n" << glm::to_string(glm::rotate(model, 0.f, glm::vec3(0, 0, 1))) << "\n";
-
     this->shader->setMatrix4("model", model, true);
-    this->shader->setMatrix4("projection", proj);   /* same every call */
+    this->shader->setMatrix4("projection", proj);   // same every call
     this->shader->setVec3f("color", animate.color);
 
     glActiveTexture(GL_TEXTURE0);
@@ -147,23 +143,27 @@ void Renderer::drawEntity(Entity& animate) {
 
     glBindVertexArray(this->vao);
 
-    /* calculate new texture coordiantes buffer */
+    // calculate new texture coordiantes buffer //
     GLfloat tc[TC_SIZE] = { 0 };
     GLuint vbo_tc;
     glGenBuffers(1, &vbo_tc);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
 
-    if (Time::currentTime == Time::lastTime) {
-        animate.frame++;
+    if (sprite) {
+        if (Time::current - animate.frameTime >= 1.0f) {
+            animate.frame++;
+            animate.frameTime = Time::current;
+        }
     }
+
     calcTextureCoords(animate, &tc);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
-    /**/
 
     glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
+    
     glBindVertexArray(0);
 }
 
@@ -215,5 +215,54 @@ void Renderer::drawText(Entity& animate, const char* const text, const float off
 
         glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
     }
+    glBindVertexArray(0);
+}
+
+void Renderer::drawPlayer(Player& player) {
+    this->shader->Use();
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model *= glm::translate(glm::mat4(1.0f), glm::vec3(player.pos.x, player.pos.y, 0));
+    model *= glm::rotate(glm::mat4(1.0f), glm::radians(player.angle), glm::vec3(0, 0, 1));
+    model *= glm::scale(glm::mat4(1.0f), glm::vec3(player.size.x, player.size.y, 1));
+
+    this->shader->setMatrix4("model", model, true);
+    this->shader->setMatrix4("projection", proj);   // same every call
+    this->shader->setVec3f("color", player.color);
+
+    glActiveTexture(GL_TEXTURE0);
+    player.image->bind();
+
+    glBindVertexArray(this->vao);
+
+    // calculate new texture coordiantes buffer
+    GLfloat tc[TC_SIZE] = { 0 };
+    GLuint vbo_tc;
+    glGenBuffers(1, &vbo_tc);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
+
+    if (Time::current - player.frameTime >= 1.0/(float)player.cols) {
+        player.frame++;
+        player.frameTime = Time::current;
+    }
+
+    if (player.still) {
+        player.frame = (unsigned int)(player.dir) * (player.cols);
+        std::cout << "still\n";
+    }
+    else {
+        player.frame = (unsigned int)(player.dir) * (player.cols) + (player.frame % player.cols);
+        std::cout << "unstill\n";
+    }
+    //std::cout << "frame: " << player.frame << "\n";
+
+    calcTextureCoords(player, &tc);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
+
+    glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
+
     glBindVertexArray(0);
 }

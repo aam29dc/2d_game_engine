@@ -1,5 +1,5 @@
 #include "time.h"
 
-float Time::currentTime = 0;
-float Time::lastTime = 0;
-float Time::deltaTime = 0;
+float Time::current = 0;
+float Time::last = 0;
+float Time::delta = 0;

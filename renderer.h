@@ -5,6 +5,7 @@
 #include "texture.h"
 #include "entity.h"
 #include "time.h"
+#include "player.h"
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
@@ -31,9 +32,10 @@ public:
 	void calcTextureCoords(Entity& animate, GLfloat (*tc)[TC_SIZE]);
 
 	void initRenderData();
-	void drawQuad(const Texture2D& texture, const glm::vec2 pos, const glm::vec2 size, const float rotate, const glm::vec3 color = glm::vec3(1,1,1));
+	void drawQuad(const Texture2D& texture, const glm::vec2 pos = glm::vec2(0,0), const glm::vec2 size = glm::vec2(1,1), const float rotate = 0.0f, const glm::vec3 color = glm::vec3(1,1,1));
 	void drawText(Entity& animate, const char* const text, const float offsetX, const float offsetY);
-	void drawEntity(Entity& animate);
+	void drawEntity(Entity& animate, const bool sprite = false);
+	void drawPlayer(Player& player);
 };
 
 #endif

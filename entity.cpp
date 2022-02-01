@@ -8,6 +8,7 @@ Entity::Entity(const unsigned int width, const unsigned int height) : cols(width
 	color = glm::vec3(1, 1, 1);
 	angle = 0.0f;
 	frame = 0;
+	frameTime = 0.0f;
 	image = nullptr;
 
 	_count++;

@@ -20,7 +20,7 @@ public:
 
 	unsigned int _width, _height;
 
-	char _keys[100] = { 0 };
+	bool _keys[1024] = { 0 };
 	Entity text;
 
 	Entity* entities;

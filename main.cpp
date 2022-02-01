@@ -11,10 +11,12 @@
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+Game game(SCR_WIDTH, SCR_HEIGHT);
 
 int main()
 {
@@ -35,6 +37,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     glewExperimental = GL_TRUE;
@@ -43,14 +46,14 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    Game game(SCR_WIDTH, SCR_HEIGHT);
     game.init();
 
     while (!glfwWindowShouldClose(window))
     {
-        Time::calc();
+        Time::current = (float)glfwGetTime();
+        Time::delta = Time::current - Time::last;
+        Time::last = Time::current;
 
-        processInput(window);
         glfwPollEvents();
         game.processInput();
 
@@ -70,11 +73,19 @@ int main()
     return 0;
 }
 
-void processInput(GLFWwindow* window)
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    if (key >= 0 && key < 1024)
+    {
+        if (action == GLFW_PRESS)
+            game._keys[key] = true;
+        else if(action == GLFW_RELEASE)
+            game._keys[key] = false;
+    }
 }
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
