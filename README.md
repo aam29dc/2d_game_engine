@@ -1,4 +1,4 @@
-# 2d_game_engine alpha 0.1.4 (C++/openGL)
+# 2d_game_engine alpha 0.1 (C++/openGL)
 
 [___0.1.4___]:
 
