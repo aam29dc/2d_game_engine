@@ -10,7 +10,7 @@
 
 [___0.1.2___]:
 
-  -added time.h,.cpp for tracking sync'd game time, added drawText to sprite renderer
+  -added time.h,.cpp, added drawText to sprite renderer
 
 [___0.1.1___]:
 
