@@ -2,7 +2,7 @@
 
 [___0.1.5___]:
 
-  -added drawCrosshair, removed/fixed gen & bind buffer: only one vbo used, and is updated with new coordinates
+  -added drawFPS, drawTimer, drawCrosshair, and removed/fixed Gen & Bind buffer: only one vbo is used, and it is updated with new coordinates.
 
 [___0.1.4___]:
 
