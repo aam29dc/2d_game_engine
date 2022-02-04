@@ -23,6 +23,7 @@ void Game::init() {
 	ResourceManager::loadTexture("C:/game/textures/brick.jpg");
 	ResourceManager::loadTexture("C:/game/textures/walk.png", true);
 	ResourceManager::loadTexture("C:/game/textures/font3.png", true);
+	ResourceManager::loadTexture("C:/game/textures/xhair.png", true);
 	std::cout << "texture count: " << Texture2D::_count << "\n";
 
 	Game::players = new Player[1];
@@ -80,7 +81,7 @@ void Game::update() {
 
 }
 
-void Game::render() {
+void Game::render(GLFWwindow* window, const unsigned int screen_width, const unsigned int screen_height) {
 	Game::renderer->drawQuad(ResourceManager::Textures[0]);		//background
 
 	for (unsigned int i = 0; i < Game::entity_count; i++) {
@@ -91,6 +92,12 @@ void Game::render() {
 		Game::renderer->drawPlayer(players[i]);
 	}
 
+	Game::renderer->drawTime(text, 1, 0.8f, 1);
+
 	Game::renderer->drawText(text, "Hello circus clown, no questions allowed! Goats are not the meta.", 0, 0);
 	Game::renderer->drawText(text, "This is another run on sentence or I dont know what im talking about?", 0, 0.2f);
+
+	Game::renderer->drawFPS(text, 0, .9f);
+
+	Game::renderer->drawCrosshair(window, ResourceManager::Textures[3], screen_width, screen_height);
 }

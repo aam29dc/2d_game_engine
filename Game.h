@@ -36,7 +36,7 @@ public:
 	void init();
 	void processInput();
 	void update();
-	void render();
+	void render(GLFWwindow* window, const unsigned int screen_width, const unsigned int screen_height);
 };
 
 #endif

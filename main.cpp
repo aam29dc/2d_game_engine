@@ -13,8 +13,8 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 800;
+unsigned int SCR_HEIGHT = 600;
 
 Game game(SCR_WIDTH, SCR_HEIGHT);
 
@@ -46,12 +46,20 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
     game.init();
 
     while (!glfwWindowShouldClose(window))
     {
+        float x = (float)glfwGetTime();
+        //std::cout << x << "\n";
+
         Time::current = (float)glfwGetTime();
         Time::delta = Time::current - Time::last;
+
+        //std::cout << "fps: " << 1 / Time::delta;
+
         Time::last = Time::current;
 
         glfwPollEvents();
@@ -62,7 +70,7 @@ int main()
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        game.render();
+        game.render(window, SCR_WIDTH, SCR_HEIGHT);
 
         glfwSwapBuffers(window);
     }
@@ -90,4 +98,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
 }

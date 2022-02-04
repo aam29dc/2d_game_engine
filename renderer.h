@@ -34,8 +34,11 @@ public:
 	void initRenderData();
 	void drawQuad(const Texture2D& texture, const glm::vec2 pos = glm::vec2(0,0), const glm::vec2 size = glm::vec2(1,1), const float rotate = 0.0f, const glm::vec3 color = glm::vec3(1,1,1));
 	void drawText(Entity& animate, const char* const text, const float offsetX, const float offsetY);
+	void drawTime(Entity& animate, const float offsetX, const float offsetY, const unsigned int decimals);
+	void drawFPS(Entity& animate, const float offsetX, const float offsetY);
 	void drawEntity(Entity& animate, const bool sprite = false);
 	void drawPlayer(Player& player);
+	void drawCrosshair(GLFWwindow* window, const Texture2D& texture, const unsigned int screen_width, const unsigned int screen_height);
 };
 
 #endif

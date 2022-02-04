@@ -6,20 +6,10 @@ const GLfloat n_tc[TC_SIZE] = { 0, 1,
    1, 0,
    0, 0 };
 
-GLuint n_vbo_tc;
-
 const glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f);
 
 Renderer::Renderer(Shader* shader) : vao(-1) {
     this->shader = shader;
-
-    //generate normalized texture coords buffer
-    glGenBuffers(1, &n_vbo_tc);
-    glBindBuffer(GL_ARRAY_BUFFER, n_vbo_tc);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
-
     this->initRenderData();
 }
 
@@ -44,9 +34,11 @@ void Renderer::initRenderData() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 
-    glGenBuffers(1, &n_vbo_tc);
-    glBindBuffer(GL_ARRAY_BUFFER, n_vbo_tc);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);
+    //generate texture coords buffer
+    GLuint vbo_tc;
+    glGenBuffers(1, &vbo_tc);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);  // same size as n_tc
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 
@@ -60,13 +52,13 @@ void Renderer::initRenderData() {
     glBindVertexArray(0);
 }
 
-void Renderer::drawQuad(const Texture2D &texture, const glm::vec2 pos, const glm::vec2 size, const float rotate, const glm::vec3 color) {
+void Renderer::drawQuad(const Texture2D& texture, const glm::vec2 pos, const glm::vec2 size, const float rotate, const glm::vec3 color) {
     this->shader->Use();
 
     glm::mat4 model = glm::mat4(1.0);
-    model *= glm::translate(model, glm::vec3(pos.x, pos.y, 0));
-    model *= glm::rotate(model, glm::radians(rotate), glm::vec3(0, 0, 1.0));
-    model *= glm::scale(model, glm::vec3(size.x, size.y, 1));
+    model *= glm::translate(glm::mat4(1.0), glm::vec3(pos.x, pos.y, 0));
+    model *= glm::rotate(glm::mat4(1.0), glm::radians(rotate), glm::vec3(0, 0, 1.0));
+    model *= glm::scale(glm::mat4(1.0), glm::vec3(size.x, size.y, 1));
 
     this->shader->setMatrix4("model", model, true);
     this->shader->setMatrix4("projection", proj);
@@ -77,18 +69,10 @@ void Renderer::drawQuad(const Texture2D &texture, const glm::vec2 pos, const glm
 
     glBindVertexArray(this->vao);
     /* draw with normalized texture coords buffer */
-    glBindBuffer(GL_ARRAY_BUFFER, n_vbo_tc);
     glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
     /**/
-
-    GLint num = 0;
-    glGetIntegerv(GL_ARRAY_BUFFER, &num);
-
-    static int ran = 0;
-    if(ran==0) std::cout << "num: " << num << "\n";
-    ran++;
 
     glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -145,9 +129,6 @@ void Renderer::drawEntity(Entity& animate, const bool sprite) {
 
     // calculate new texture coordiantes buffer //
     GLfloat tc[TC_SIZE] = { 0 };
-    GLuint vbo_tc;
-    glGenBuffers(1, &vbo_tc);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
 
     if (sprite) {
         if (Time::current - animate.frameTime >= 1.0f) {
@@ -180,9 +161,6 @@ void Renderer::drawText(Entity& animate, const char* const text, const float off
 
     /* calculate new texture coordiantes buffer */
     GLfloat tc[TC_SIZE] = { 0 };
-    GLuint vbo_tc;
-    glGenBuffers(1, &vbo_tc);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
 
     glm::mat4 model = glm::mat4(1.0);
     glm::vec3 translate = glm::vec3(0);
@@ -218,6 +196,48 @@ void Renderer::drawText(Entity& animate, const char* const text, const float off
     glBindVertexArray(0);
 }
 
+void Renderer::drawTime(Entity& animate, const float offsetX, const float offsetY, const unsigned int decimals) {
+    float current = (float)glfwGetTime();
+
+    int tens = 0;
+
+    for (; current / (pow(10, tens)) > 1.0f; tens++) {
+    }
+
+    std::string text_str = std::to_string(current).substr(0,tens+decimals+1);
+    const char * const c_text = text_str.c_str();
+
+    glm::vec3 temp = animate.color;
+    animate.color = glm::vec3(1, 1, 1);
+    drawText(animate, c_text, offsetX, offsetY);
+    animate.color = temp;
+}
+
+void Renderer::drawFPS(Entity& animate, const float offsetX, const float offsetY) {
+    const unsigned int fps = (unsigned int)(1 / Time::delta);
+
+    if (Time::current - animate.frameTime >= 1.0f) {
+        animate.frameTime = Time::current;
+    }
+
+    const std::string fps_s = std::to_string(fps);
+    const char* const fps_c = fps_s.c_str();
+
+    Renderer::drawText(animate, fps_c, offsetX, offsetY);
+}
+
+void Renderer::drawCrosshair(GLFWwindow* window, const Texture2D& texture, const unsigned int screen_width, const unsigned int screen_height) {
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    xpos = xpos / (float)screen_width;
+    ypos = -ypos / (float)screen_height;
+    xpos += -0.5f;
+    ypos += 0.5f;
+    xpos *= 2;
+    ypos *= 2;
+    drawQuad(texture, glm::vec2(xpos, ypos), glm::vec2(0.05f, 0.05f), 0, glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
 void Renderer::drawPlayer(Player& player) {
     this->shader->Use();
 
@@ -237,22 +257,19 @@ void Renderer::drawPlayer(Player& player) {
 
     // calculate new texture coordiantes buffer
     GLfloat tc[TC_SIZE] = { 0 };
-    GLuint vbo_tc;
-    glGenBuffers(1, &vbo_tc);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
 
-    if (Time::current - player.frameTime >= 1.0/(float)player.cols) {
+    if (Time::current - player.frameTime >= 1.0f/(float)player.cols) {
         player.frame++;
         player.frameTime = Time::current;
     }
 
     if (player.still) {
         player.frame = (unsigned int)(player.dir) * (player.cols);
-        std::cout << "still\n";
+        //std::cout << "still\n";
     }
     else {
         player.frame = (unsigned int)(player.dir) * (player.cols) + (player.frame % player.cols);
-        std::cout << "unstill\n";
+        //std::cout << "unstill\n";
     }
     //std::cout << "frame: " << player.frame << "\n";
 
