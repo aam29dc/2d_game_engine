@@ -70,8 +70,6 @@ void Renderer::drawQuad(const Texture2D& texture, const glm::vec2 pos, const glm
     glBindVertexArray(this->vao);
     /* draw with normalized texture coords buffer */
     glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
     /**/
 
     glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
@@ -140,8 +138,6 @@ void Renderer::drawEntity(Entity& animate, const bool sprite) {
     calcTextureCoords(animate, &tc);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 
     glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
     
@@ -188,8 +184,6 @@ void Renderer::drawText(Entity& animate, const char* const text, const float off
         //std::cout << "text[i]: " << text[j] << ", j: " << j << ", frame: " << animate.frame << "\n";
         calcTextureCoords(animate, &tc);
         glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 
         glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
     }
@@ -276,8 +270,6 @@ void Renderer::drawPlayer(Player& player) {
     calcTextureCoords(player, &tc);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 
     glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
 
