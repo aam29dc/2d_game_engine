@@ -6,6 +6,7 @@
 #include "entity.h"
 #include "time.h"
 #include "player.h"
+#include "level.h"
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
@@ -24,9 +25,16 @@ const unsigned int TC_SIZE = 8;
 class Renderer {
 public:
 	unsigned int vao;
-	Shader* shader;
 
-	Renderer(Shader* shader);
+	GLuint vbo_p;
+	GLuint vbo_tc;
+	GLuint vbo_i;
+	GLuint ebo;
+
+	Shader* shader;
+	Shader* instance;
+
+	Renderer(Shader* shader, Shader* instance);
 	~Renderer();
 
 	void calcTextureCoords(Entity& animate, GLfloat (*tc)[TC_SIZE]);
@@ -39,6 +47,9 @@ public:
 	void drawEntity(Entity& animate, const bool sprite = false);
 	void drawPlayer(Player& player);
 	void drawCrosshair(GLFWwindow* window, const Texture2D& texture, const unsigned int screen_width, const unsigned int screen_height);
+	//void drawHUD //text,timer,fps,crosshair,healthbar,inventory, ...
+	void drawLevel(Level& lvl);
+	void _drawLevel(Level& lvl);
 };
 
 #endif

@@ -8,13 +8,18 @@ const GLfloat n_tc[TC_SIZE] = { 0, 1,
 
 const glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f);
 
-Renderer::Renderer(Shader* shader) : vao(-1) {
+Renderer::Renderer(Shader* shader, Shader* instance) : vao(0), vbo_p(0), vbo_tc(0), vbo_i(0), ebo(0) {
     this->shader = shader;
+    this->instance = instance;
     this->initRenderData();
 }
 
 Renderer::~Renderer() {
 	glDeleteVertexArrays(1, &this->vao);
+    glDeleteBuffers(1, &this->vbo_p);
+    glDeleteBuffers(1, &this->vbo_tc);
+    glDeleteBuffers(1, &this->vbo_i);
+    glDeleteBuffers(1, &this->ebo);
 }
 
 void Renderer::initRenderData() {
@@ -27,24 +32,43 @@ void Renderer::initRenderData() {
             1, -1,
             1, 1,
             -1, 1 };
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glGenBuffers(1, &vbo_p);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_p);
     glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 
     //generate texture coords buffer
-    GLuint vbo_tc;
     glGenBuffers(1, &vbo_tc);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
     glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);  // same size as n_tc
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 
+    //data for instanced drawing
+    glGenBuffers(1, &vbo_i);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_i);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4)*20*20, NULL, GL_DYNAMIC_DRAW);
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(0));
+    glVertexAttribDivisor(2, 1);
+
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(float) * 4));
+    glVertexAttribDivisor(3, 1);
+
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(float) * 8));
+    glVertexAttribDivisor(4, 1);
+
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(float) * 12));
+    glVertexAttribDivisor(5, 1);
+
+    //element buffer
     GLuint indices[INDICES_SIZE] = { 0,1,2,
                     2,3,0 };
-    GLuint ebo;
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -69,6 +93,7 @@ void Renderer::drawQuad(const Texture2D& texture, const glm::vec2 pos, const glm
 
     glBindVertexArray(this->vao);
     /* draw with normalized texture coords buffer */
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
     glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);
     /**/
 
@@ -137,6 +162,7 @@ void Renderer::drawEntity(Entity& animate, const bool sprite) {
 
     calcTextureCoords(animate, &tc);
 
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
     glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
 
     glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
@@ -183,6 +209,7 @@ void Renderer::drawText(Entity& animate, const char* const text, const float off
         animate.frame = (unsigned int)text[j];
         //std::cout << "text[i]: " << text[j] << ", j: " << j << ", frame: " << animate.frame << "\n";
         calcTextureCoords(animate, &tc);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
         glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
 
         glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
@@ -269,9 +296,38 @@ void Renderer::drawPlayer(Player& player) {
 
     calcTextureCoords(player, &tc);
 
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
     glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_STATIC_DRAW);
 
     glDrawElements(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0);
 
+    glBindVertexArray(0);
+}
+
+void Renderer::drawLevel(Level& lvl) {
+    this->instance->Use();
+
+    this->instance->setMatrix4("projection", proj);
+
+    glm::mat4 model[20*20] = {};
+
+    for (int i = 0; i < 20*20; i++) {
+        model[i] = glm::mat4(1.0);
+        model[i] *= glm::translate(glm::mat4(1.0), glm::vec3(lvl.bricks[i].pos.x, lvl.bricks[i].pos.y, 0));
+        model[i] *= glm::rotate(glm::mat4(1.0), glm::radians(0.0f), glm::vec3(0, 0, 1.0));
+        model[i] *= glm::scale(glm::mat4(1.0), glm::vec3(lvl.bricks[i].size.x, lvl.bricks[i].size.y, 1));
+    }
+
+    glActiveTexture(GL_TEXTURE0);
+    lvl.bricks[0].image->bind();
+
+    glBindVertexArray(this->vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_i);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(model), model);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);
+
+    glDrawElementsInstanced(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0, 20*20);
     glBindVertexArray(0);
 }

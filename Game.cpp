@@ -13,11 +13,12 @@ Game::~Game() {
 }
 
 void Game::init() {
-	ResourceManager::Shaders = new Shader[1];
+	ResourceManager::Shaders = new Shader[2];
 	ResourceManager::loadShader("C:/Users/user052e/source/repos/glgui/glgui/sprite.vs", "C:/Users/user052e/source/repos/glgui/glgui/sprite.fs");
+	ResourceManager::loadShader("C:/Users/user052e/source/repos/glgui/glgui/instance.vs", "C:/Users/user052e/source/repos/glgui/glgui/instance.fs");
 	std::cout << "shader count: " << Shader::_count << "\n";
 
-	Game::renderer = new Renderer(&ResourceManager::Shaders[0]);
+	Game::renderer = new Renderer(&ResourceManager::Shaders[0], &ResourceManager::Shaders[1]);
 
 	ResourceManager::Textures = new Texture2D[3];
 	ResourceManager::loadTexture("C:/game/textures/brick.jpg");
@@ -40,6 +41,9 @@ void Game::init() {
 	Game::text.color = glm::vec3(0, 1, 0);
 	Game::text.size = glm::vec2(TEXT_SIZE, TEXT_SIZE);
 	Game::text.image = &ResourceManager::Textures[2];
+
+	Game::levels = new Level[1];
+	levels[0].init(&ResourceManager::Textures[0]);
 }
 
 void Game::processInput() {
@@ -82,11 +86,12 @@ void Game::update() {
 }
 
 void Game::render(GLFWwindow* window, const unsigned int screen_width, const unsigned int screen_height) {
-	Game::renderer->drawQuad(ResourceManager::Textures[0]);		//background
+	//Game::renderer->drawQuad(ResourceManager::Textures[0]);		//background
+	Game::renderer->drawLevel(Game::levels[0]);
 
-	for (unsigned int i = 0; i < Game::entity_count; i++) {
+	/*for (unsigned int i = 0; i < Game::entity_count; i++) {
 		Game::renderer->drawEntity(entities[i]);
-	}
+	}*/
 
 	for (unsigned int i = 0; i < Game::players->_count; i++) {
 		Game::renderer->drawPlayer(players[i]);
@@ -99,5 +104,5 @@ void Game::render(GLFWwindow* window, const unsigned int screen_width, const uns
 
 	Game::renderer->drawFPS(text, 0, .9f);
 
-	Game::renderer->drawCrosshair(window, ResourceManager::Textures[3], screen_width, screen_height);
+	//Game::renderer->drawCrosshair(window, ResourceManager::Textures[3], screen_width, screen_height);
 }

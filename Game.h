@@ -7,6 +7,7 @@
 #include "time.h"
 #include "entity.h"
 #include "player.h"
+#include "level.h"
 
 enum GameState {
 	MENU = 0,
@@ -29,6 +30,8 @@ public:
 	Renderer* renderer;
 
 	Player* players;
+
+	Level* levels;
 
 	Game(const unsigned int w, const unsigned int h);
 	~Game();
