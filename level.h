@@ -9,6 +9,7 @@ const unsigned int MAP_SIZE = 400;
 class Level {
 public:
 	Entity* bricks;
+	Texture2D* image;
 
 	Level();
 	~Level();

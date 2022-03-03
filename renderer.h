@@ -49,7 +49,6 @@ public:
 	void drawCrosshair(GLFWwindow* window, const Texture2D& texture, const unsigned int screen_width, const unsigned int screen_height);
 	//void drawHUD //text,timer,fps,crosshair,healthbar,inventory, ...
 	void drawLevel(Level& lvl);
-	void _drawLevel(Level& lvl);
 };
 
 #endif

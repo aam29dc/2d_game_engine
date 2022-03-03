@@ -309,7 +309,7 @@ void Renderer::drawLevel(Level& lvl) {
 
     this->instance->setMatrix4("projection", proj);
 
-    glm::mat4 model[20*20] = {};
+    static glm::mat4 model[20*20] = {};
 
     for (int i = 0; i < 20*20; i++) {
         model[i] = glm::mat4(1.0);
@@ -319,14 +319,30 @@ void Renderer::drawLevel(Level& lvl) {
     }
 
     glActiveTexture(GL_TEXTURE0);
-    lvl.bricks[0].image->bind();
+    lvl.image->bind();
 
     glBindVertexArray(this->vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_i);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(model), model);
 
+    /*static GLfloat tc[20 * 20][8] = {};
+
+    for (int i = 0; i < 20 * 20; i++) {
+        calcTextureCoords(lvl.bricks[i], &tc[i]);
+    }
+
+    static GLfloat tcf[20 * 20 * 8] = {};
+
+    for (int i = 0; i < 20 * 20; i++) {
+        for (int j = 0; j < 8; j++) {
+            tcf[i * 8 + j] = tc[i][j];
+        }
+    }*/
+
     glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
     glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);
+    //glVertexAttribPointer(1, 8, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), NULL);
+    //glVertexAttribDivisor(1, 1);
 
     glDrawElementsInstanced(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0, 20*20);
     glBindVertexArray(0);

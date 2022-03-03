@@ -2,7 +2,7 @@
 
 unsigned int Player::_count = 0;
 
-Player::Player() : Entity(1,1), velocity(0.0f,0.0f), still(true), dir(d) {
+Player::Player() : Entity(1,1), velocity(0.0f,0.0f), still(true), dir(d), alive(true) {
 	_count++;
 }
 

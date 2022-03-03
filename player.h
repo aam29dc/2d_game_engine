@@ -21,6 +21,7 @@ public:
 	glm::vec2 velocity;
 	unsigned int dir;
 	bool still;			// stationary, not moving
+	bool alive;
 
 	Player();
 	~Player();

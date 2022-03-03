@@ -20,6 +20,9 @@ public:
 	glm::vec3 color;
 	float angle;
 
+	bool solid;
+	bool destroyed;
+
 	float frameTime;
 	unsigned int frame;
 	Texture2D* image;

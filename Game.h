@@ -25,7 +25,6 @@ public:
 	Entity text;
 
 	Entity* entities;
-	unsigned int entity_count;
 
 	Renderer* renderer;
 
@@ -40,6 +39,7 @@ public:
 	void processInput();
 	void update();
 	void render(GLFWwindow* window, const unsigned int screen_width, const unsigned int screen_height);
+	void detectCollisions();
 };
 
 #endif

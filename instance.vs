@@ -8,8 +8,6 @@ layout (location = 3) in vec4 m2;
 layout (location = 4) in vec4 m3;
 layout (location = 5) in vec4 m4;
 
-//layout (location = 3) in vec3 color;
-
 out vec2 textcoords;
 
 uniform mat4 projection;

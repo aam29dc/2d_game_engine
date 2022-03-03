@@ -4,7 +4,7 @@ const float TEXT_SIZE = 0.025f;
 const float TEXT_SMALL = TEXT_SIZE / 2.0f;
 const float TEXT_LARGE = 2.0f * TEXT_SIZE;
 
-Game::Game(const unsigned int w, const unsigned int h) : State((GameState)0), _width(w), _height(h), text(Entity(16,16)), entity_count(0) {
+Game::Game(const unsigned int w, const unsigned int h) : State((GameState)0), _width(w), _height(h), text(Entity(16,16)) {
 }
 
 Game::~Game() {
@@ -20,11 +20,12 @@ void Game::init() {
 
 	Game::renderer = new Renderer(&ResourceManager::Shaders[0], &ResourceManager::Shaders[1]);
 
-	ResourceManager::Textures = new Texture2D[3];
-	ResourceManager::loadTexture("C:/game/textures/brick.jpg");
+	ResourceManager::Textures = new Texture2D[4];
+	ResourceManager::loadTexture("C:/game/textures/atlas.jpg");
 	ResourceManager::loadTexture("C:/game/textures/walk.png", true);
 	ResourceManager::loadTexture("C:/game/textures/font3.png", true);
 	ResourceManager::loadTexture("C:/game/textures/xhair.png", true);
+	ResourceManager::loadTexture("C:/game/textures/brick.jpg");
 	std::cout << "texture count: " << Texture2D::_count << "\n";
 
 	Game::players = new Player[1];
@@ -35,7 +36,7 @@ void Game::init() {
 	Game::players[0].image = &ResourceManager::Textures[1];
 	Game::players[0].size = glm::vec2(0.25f, 0.25f);
 	Game::players[0].color = glm::vec3(1.0f, 1.0f, 0.0f);
-	Game::players[0].pos = glm::vec2(0, -0.5);
+	Game::players[0].pos = glm::vec2(0, 0);
 	Game::players[0].dir = d;
 
 	Game::text.color = glm::vec3(0, 1, 0);
@@ -44,6 +45,17 @@ void Game::init() {
 
 	Game::levels = new Level[1];
 	levels[0].init(&ResourceManager::Textures[0]);
+
+	Game::entities = new Entity[1];
+	entities[0].pos = glm::vec2(0, 0.5);
+	entities[0].size = glm::vec2(0.5, 0.5);
+	entities[0].angle = 0.0f;
+	entities[0].frame = 0;
+	entities[0].destroyed = false;
+	entities[0].image = &ResourceManager::Textures[4];
+	entities[0].solid = true;
+	entities[0].rows = 1;
+	entities[0].cols = 1;
 }
 
 void Game::processInput() {
@@ -82,16 +94,16 @@ void Game::processInput() {
 }
 
 void Game::update() {
-
+	detectCollisions();
 }
 
 void Game::render(GLFWwindow* window, const unsigned int screen_width, const unsigned int screen_height) {
 	//Game::renderer->drawQuad(ResourceManager::Textures[0]);		//background
 	Game::renderer->drawLevel(Game::levels[0]);
 
-	/*for (unsigned int i = 0; i < Game::entity_count; i++) {
+	for (unsigned int i = 0; i < 1; i++) {
 		Game::renderer->drawEntity(entities[i]);
-	}*/
+	}
 
 	for (unsigned int i = 0; i < Game::players->_count; i++) {
 		Game::renderer->drawPlayer(players[i]);
@@ -104,5 +116,46 @@ void Game::render(GLFWwindow* window, const unsigned int screen_width, const uns
 
 	Game::renderer->drawFPS(text, 0, .9f);
 
-	//Game::renderer->drawCrosshair(window, ResourceManager::Textures[3], screen_width, screen_height);
+	Game::renderer->drawCrosshair(window, ResourceManager::Textures[3], screen_width, screen_height);
+}
+
+void Game::detectCollisions() {
+	//check collisions of players against other players
+	for (unsigned int i = 0; i < Player::_count; i++) {
+		for (unsigned int j = i+1; j < Player::_count; j++) {
+	
+		}
+	}
+
+	//check collisions of players against other lvl entities
+	for (unsigned int i = 0; i < Player::_count; i++) {
+		for (unsigned int j = 0; j < MAP_SIZE; j++) {
+			if (Game::levels[0].bricks[j].solid) {
+				if (Game::players[i].pos.x >= Game::levels[0].bricks[j].pos.x &&
+					Game::players[i].pos.x <= Game::levels[0].bricks[j].pos.x + Game::levels[0].bricks[j].size.x / 2.0f &&
+					Game::players[i].pos.y >= Game::levels[0].bricks[j].pos.y &&
+					Game::players[i].pos.y <= Game::levels[0].bricks[j].pos.y + Game::levels[0].bricks[j].size.y / 2.0f) {
+						Game::players[i].velocity = glm::vec2(0, 0);
+						std::cout << "coll lvl\n";
+				}
+			}
+		}
+	}
+
+	//check collisions of players against game entities
+	for (unsigned int i = 0; i < Player::_count; i++) {
+		for (unsigned int j = 0; j < 1; j++) {
+			if (Game::entities[j].solid) {
+				if (Game::players[i].pos.x >= Game::entities[j].pos.x &&
+					Game::players[i].pos.x <= Game::entities[j].pos.x + Game::entities[j].size.x / 2.0f &&
+					Game::players[i].pos.y >= Game::entities[j].pos.y &&
+					Game::players[i].pos.y <= Game::entities[j].pos.y + Game::entities[j].size.y / 2.0f) {
+						Game::players[i].velocity = glm::vec2(0, 0);
+						//Game::entities[j].solid = false;
+						//Game::entities[j].destroyed = true;
+						std::cout << "coll e\n";
+				}
+			}
+		}
+	}
 }

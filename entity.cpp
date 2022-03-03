@@ -10,7 +10,8 @@ Entity::Entity(const unsigned int width, const unsigned int height) : cols(width
 	frame = 0;
 	frameTime = 0.0f;
 	image = nullptr;
-
+	solid = false;
+	destroyed = false;
 	_count++;
 }
 
