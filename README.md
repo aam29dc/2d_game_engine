@@ -2,7 +2,7 @@
 
 [___0.1.7___]:
 
-  -added Uniform Buffer Object for projection matrix that is constant across sprite and instance shaders. Added front face culling (CW) for less shader invokes.
+  -added Uniform Buffer Object for projection matrix that is constant across sprite and instance shaders. Added front face culling (CW) for less shader invokes. Added Game_object.h, an extension of Entity.h. (The OO design of classes is likely to change...)
 
 [___0.1.6___]:
 
