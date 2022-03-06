@@ -1,5 +1,7 @@
 # 2d_game_engine alpha 0.1 (C++/openGL)
 
+![pilot](https://user-images.githubusercontent.com/73267302/156921526-8f22d599-cefb-473f-b003-c8aba987a110.png)
+
 [___0.1.7___]:
 
   -added Uniform Buffer Object for projection matrix that is constant across sprite and instance shaders. Added front face culling (CW) for less shader invokes. Added Game_object.h, an extension of Entity.h. (The OO design of classes is likely to change...)
