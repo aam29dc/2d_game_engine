@@ -2,7 +2,7 @@
 
 [___0.1.7___]:
 
-  -added Uniform Buffer Object for projection matrix that is constant across sprite and instance shaders
+  -added Uniform Buffer Object for projection matrix that is constant across sprite and instance shaders. Added front face culling (CW) for less shade invokes, and improved performance.
 
 [___0.1.6___]:
 
