@@ -2,7 +2,7 @@
 
 [___0.1.7___]:
 
-  -added Uniform buffer object for projection matrix that is constant across sprite and instance shaders
+  -added Uniform Buffer Object for projection matrix that is constant across sprite and instance shaders
 
 [___0.1.6___]:
 
