@@ -1,5 +1,9 @@
 # 2d_game_engine alpha 0.1 (C++/openGL)
 
+[___0.1.7___]:
+
+  -added Uniform buffer object for projection matrix that is constant across sprite and instance shaders
+
 [___0.1.6___]:
 
   -added drawLevel(with instanced drawing).
