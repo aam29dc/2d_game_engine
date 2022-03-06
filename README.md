@@ -1,6 +1,4 @@
 # 2d_game_engine alpha 0.1 (C++/openGL)
-(this is a non-animated screenshot of an early version of the engine. Yes, you can move the character around, and it is correctly animated to show movements in the direction you go in).
-![pilot](https://user-images.githubusercontent.com/73267302/156921526-8f22d599-cefb-473f-b003-c8aba987a110.png)
 
 [___0.1.7___]:
 
@@ -35,3 +33,6 @@
 engine has:
   resource manager: (shaders, textures, game objects),
   and sprite renderer
+  
+  (this is a non-animated screenshot of an early version of the engine. Yes, you can move the character around, and it is correctly animated to show movements in the direction you go in).
+![pilot](https://user-images.githubusercontent.com/73267302/156921526-8f22d599-cefb-473f-b003-c8aba987a110.png)
