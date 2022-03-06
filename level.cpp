@@ -1,12 +1,12 @@
 #include "level.h"
 
 Level::Level() {
-	bricks = new Entity[MAP_SIZE];
+	bricks = new GameObject[MAP_SIZE];
 	image = NULL;
 }
 
 Level::~Level() {
-	//delete [] bricks;
+	delete[] bricks;
 }
 
 void Level::init(Texture2D* default_texture) {

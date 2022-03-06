@@ -20,17 +20,13 @@ public:
 	glm::vec3 color;
 	float angle;
 
-	bool solid;
-	bool destroyed;
-
-	float frameTime;
-	unsigned int frame;
 	Texture2D* image;
+	float frameTime;		// update the current frame with time
+	unsigned int frame;		// current frame of entity
+	unsigned int cols;		// # of cols in the image
+	unsigned int rows;		// # of rows in the image
 
-	unsigned int cols;
-	unsigned int rows;
-
-	Entity(const unsigned int cols = 1, const unsigned int rows = 1);
+	Entity(const unsigned int width = 1, const unsigned int height = 1);
 	~Entity();
 
 	void print() const {

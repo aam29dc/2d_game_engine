@@ -159,7 +159,7 @@ void Renderer::drawEntity(Entity& animate, const bool sprite) {
 
     glBindVertexArray(this->vao);
 
-    // calculate new texture coordiantes buffer //
+    // calculate new texture coordiantes buffer
     GLfloat tc[TC_SIZE] = { 0 };
 
     if (sprite) {

@@ -4,6 +4,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "entity.h"
+#include "text.h"
 #include "time.h"
 #include "player.h"
 #include "level.h"

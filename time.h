@@ -10,12 +10,6 @@ public:
 	static float last;
 	static float delta;
 
-	/*static void calc() {
-		currentTime = (float)glfwGetTime();
-		deltaTime = currentTime - lastTime;
-		lastTime = currentTime;
-	}*/
-
 	static void print() {
 		std::cout << "cT: " << current << "\n" << "dT: " << delta << "\n" << "lT: " << last << "\n\n";
 	}

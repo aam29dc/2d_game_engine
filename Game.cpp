@@ -9,7 +9,10 @@ Game::Game(const unsigned int w, const unsigned int h) : State((GameState)0), _w
 
 Game::~Game() {
 	delete Game::renderer;
-	delete [] Game::entities;
+	delete[] Game::entities;
+	delete[] Game::objects;
+	delete[] Game::levels;
+	delete[] Game::players;
 }
 
 void Game::init() {
@@ -46,16 +49,16 @@ void Game::init() {
 	Game::levels = new Level[1];
 	levels[0].init(&ResourceManager::Textures[0]);
 
-	Game::entities = new Entity[1];
-	entities[0].pos = glm::vec2(0, 0.5);
-	entities[0].size = glm::vec2(0.5, 0.5);
-	entities[0].angle = 0.0f;
-	entities[0].frame = 0;
-	entities[0].destroyed = false;
-	entities[0].image = &ResourceManager::Textures[4];
-	entities[0].solid = true;
-	entities[0].rows = 1;
-	entities[0].cols = 1;
+	Game::objects = new GameObject[1];
+	objects[0].pos = glm::vec2(0, 0.5);
+	objects[0].size = glm::vec2(0.5, 0.5);
+	objects[0].angle = 0.0f;
+	objects[0].frame = 0;
+	objects[0].destroyed = false;
+	objects[0].image = &ResourceManager::Textures[4];
+	objects[0].solid = true;
+	objects[0].rows = 1;
+	objects[0].cols = 1;
 }
 
 void Game::processInput() {
@@ -102,7 +105,7 @@ void Game::render(GLFWwindow* window, const unsigned int screen_width, const uns
 	Game::renderer->drawLevel(Game::levels[0]);
 
 	for (unsigned int i = 0; i < 1; i++) {
-		Game::renderer->drawEntity(entities[i]);
+		Game::renderer->drawEntity(objects[i]);
 	}
 
 	for (unsigned int i = 0; i < Game::players->_count; i++) {
@@ -145,11 +148,11 @@ void Game::detectCollisions() {
 	//check collisions of players against game entities
 	for (unsigned int i = 0; i < Player::_count; i++) {
 		for (unsigned int j = 0; j < 1; j++) {
-			if (Game::entities[j].solid) {
-				if (Game::players[i].pos.x >= Game::entities[j].pos.x &&
-					Game::players[i].pos.x <= Game::entities[j].pos.x + Game::entities[j].size.x / 2.0f &&
-					Game::players[i].pos.y >= Game::entities[j].pos.y &&
-					Game::players[i].pos.y <= Game::entities[j].pos.y + Game::entities[j].size.y / 2.0f) {
+			if (Game::objects[j].solid) {
+				if (Game::players[i].pos.x >= Game::objects[j].pos.x &&
+					Game::players[i].pos.x <= Game::objects[j].pos.x + Game::objects[j].size.x / 2.0f &&
+					Game::players[i].pos.y >= Game::objects[j].pos.y &&
+					Game::players[i].pos.y <= Game::objects[j].pos.y + Game::objects[j].size.y / 2.0f) {
 						Game::players[i].velocity = glm::vec2(0, 0);
 						//Game::entities[j].solid = false;
 						//Game::entities[j].destroyed = true;

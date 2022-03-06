@@ -6,6 +6,7 @@
 #include "utility.h"
 #include "time.h"
 #include "entity.h"
+#include "game_object.h"
 #include "player.h"
 #include "level.h"
 
@@ -25,6 +26,8 @@ public:
 	Entity text;
 
 	Entity* entities;
+
+	GameObject* objects;
 
 	Renderer* renderer;
 
