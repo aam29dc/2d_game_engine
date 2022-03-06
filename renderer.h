@@ -18,7 +18,7 @@
 	#endif
 #endif
 
-const unsigned int POINTS_SIZE = 8;
+const unsigned int VERTICES_SIZE = 8;
 const unsigned int INDICES_SIZE = 6;
 const unsigned int TC_SIZE = 8;
 
@@ -26,10 +26,11 @@ class Renderer {
 public:
 	unsigned int vao;
 
-	GLuint vbo_p;
+	GLuint vbo_v;
 	GLuint vbo_tc;
 	GLuint vbo_i;
 	GLuint ebo;
+	GLuint ubo;
 
 	Shader* shader;
 	Shader* instance;

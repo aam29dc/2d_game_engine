@@ -8,18 +8,19 @@ const GLfloat n_tc[TC_SIZE] = { 0, 1,
 
 const glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f);
 
-Renderer::Renderer(Shader* shader, Shader* instance) : vao(0), vbo_p(0), vbo_tc(0), vbo_i(0), ebo(0) {
+Renderer::Renderer(Shader* shader, Shader* instance) : vao(0), vbo_v(0), vbo_tc(0), vbo_i(0), ebo(0) {
     this->shader = shader;
     this->instance = instance;
     this->initRenderData();
 }
 
 Renderer::~Renderer() {
-	glDeleteVertexArrays(1, &this->vao);
-    glDeleteBuffers(1, &this->vbo_p);
+    glDeleteBuffers(1, &this->vbo_v);
     glDeleteBuffers(1, &this->vbo_tc);
     glDeleteBuffers(1, &this->vbo_i);
     glDeleteBuffers(1, &this->ebo);
+    glDeleteBuffers(1, &this->ubo);
+    glDeleteVertexArrays(1, &this->vao);
 }
 
 void Renderer::initRenderData() {
@@ -28,13 +29,14 @@ void Renderer::initRenderData() {
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
 
-    GLfloat points[POINTS_SIZE] = { -1, -1,
+    //vertex data
+    GLfloat vertices[VERTICES_SIZE] = { -1, -1,
             1, -1,
             1, 1,
             -1, 1 };
-    glGenBuffers(1, &vbo_p);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_p);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    glGenBuffers(1, &vbo_v);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_v);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 
@@ -73,6 +75,15 @@ void Renderer::initRenderData() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+    //uniform buffer object for projection matrix that is the same between all shaders
+    glUniformBlockBinding(this->shader->ID, glGetUniformBlockIndex(this->shader->ID, "CONST_DATA"), 0);
+    glUniformBlockBinding(this->instance->ID, glGetUniformBlockIndex(this->instance->ID, "CONST_DATA"), 0);
+    glGenBuffers(1, &ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, 0, sizeof(glm::mat4) + sizeof(GLfloat)*8);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(proj));
+
     glBindVertexArray(0);
 }
 
@@ -85,7 +96,6 @@ void Renderer::drawQuad(const Texture2D& texture, const glm::vec2 pos, const glm
     model *= glm::scale(glm::mat4(1.0), glm::vec3(size.x, size.y, 1));
 
     this->shader->setMatrix4("model", model, true);
-    this->shader->setMatrix4("projection", proj);
     this->shader->setVec3f("color", color);
 
     glActiveTexture(GL_TEXTURE0);
@@ -142,7 +152,6 @@ void Renderer::drawEntity(Entity& animate, const bool sprite) {
     model *= glm::scale(glm::mat4(1.0f), glm::vec3(animate.size.x, animate.size.y, 1));
 
     this->shader->setMatrix4("model", model, true);
-    this->shader->setMatrix4("projection", proj);   // same every call
     this->shader->setVec3f("color", animate.color);
 
     glActiveTexture(GL_TEXTURE0);
@@ -173,7 +182,6 @@ void Renderer::drawEntity(Entity& animate, const bool sprite) {
 void Renderer::drawText(Entity& animate, const char* const text, const float offsetX, const float offsetY)  {
     this->shader->Use();
 
-    this->shader->setMatrix4("projection", proj, true);        /* same every call */
     this->shader->setVec3f("color", animate.color);
 
     glActiveTexture(GL_TEXTURE0);
@@ -268,7 +276,6 @@ void Renderer::drawPlayer(Player& player) {
     model *= glm::scale(glm::mat4(1.0f), glm::vec3(player.size.x, player.size.y, 1));
 
     this->shader->setMatrix4("model", model, true);
-    this->shader->setMatrix4("projection", proj);   // same every call
     this->shader->setVec3f("color", player.color);
 
     glActiveTexture(GL_TEXTURE0);
@@ -306,8 +313,6 @@ void Renderer::drawPlayer(Player& player) {
 
 void Renderer::drawLevel(Level& lvl) {
     this->instance->Use();
-
-    this->instance->setMatrix4("projection", proj);
 
     static glm::mat4 model[20*20] = {};
 

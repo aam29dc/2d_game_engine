@@ -12,7 +12,7 @@ Player::~Player() {
 
 void Player::calcDirection(const bool(* const keys)[1024]) {
     //get direction player is currently going in
-    Dir direction = (Dir)this->dir;
+    Dir direction = (Dir)dir;
 
     Player::still = false;
  
@@ -42,5 +42,5 @@ void Player::calcDirection(const bool(* const keys)[1024]) {
     }
     else Player::still = true;
 
-    this->dir = (unsigned int)direction;
+    dir = (unsigned int)direction;
 }
