@@ -8,9 +8,9 @@ const GLfloat n_tc[TC_SIZE] = { 0, 1,
 
 const glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f);
 
-Renderer::Renderer(Shader* shader, Shader* instance) : vao(0), vbo_v(0), vbo_tc(0), vbo_i(0), ebo(0) {
-    this->shader = shader;
-    this->instance = instance;
+Renderer::Renderer(Shader& shader, Shader& instance) : vao(0), vbo_v(0), vbo_tc(0), vbo_i(0), ebo(0) {
+    this->shader = &shader;
+    this->instance = &instance;
     this->initRenderData();
 }
 
@@ -346,7 +346,7 @@ void Renderer::drawLevel(Level& lvl) {
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo_tc);
     glBufferData(GL_ARRAY_BUFFER, sizeof(n_tc), n_tc, GL_STATIC_DRAW);
-    //glVertexAttribPointer(1, 8, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), NULL);
+    //glVertexAttribPointer(1, 8, GL_float, GL_FALSE, 8 * sizeof(GLfloat), NULL);
     //glVertexAttribDivisor(1, 1);
 
     glDrawElementsInstanced(GL_TRIANGLES, INDICES_SIZE, GL_UNSIGNED_INT, 0, 20*20);

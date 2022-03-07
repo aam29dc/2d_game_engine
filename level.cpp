@@ -9,8 +9,8 @@ Level::~Level() {
 	delete[] bricks;
 }
 
-void Level::init(Texture2D* default_texture) {
-	image = default_texture;
+void Level::init(Texture2D& default_texture) {
+	image = &default_texture;
 
 	for (int i = 0; i < 20; i++) {
 		for (int j = 0; j < 20; j++) {

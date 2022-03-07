@@ -18,7 +18,7 @@ enum Dir {
 class Player : public Entity {
 public:
 	static unsigned int _count;
-	glm::vec2 velocity;
+	double speed;
 	unsigned int dir;
 	bool still;			// stationary, not moving
 	bool alive;

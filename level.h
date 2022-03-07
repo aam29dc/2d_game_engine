@@ -14,7 +14,7 @@ public:
 	Level();
 	~Level();
 
-	void init(Texture2D* default_texture);
+	void init(Texture2D& default_texture);
 	void loadLevel(const char* const file);
 };
 

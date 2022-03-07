@@ -4,7 +4,6 @@
 #include "shader.h"
 #include "texture.h"
 #include "entity.h"
-#include "text.h"
 #include "time.h"
 #include "player.h"
 #include "level.h"
@@ -36,7 +35,7 @@ public:
 	Shader* shader;
 	Shader* instance;
 
-	Renderer(Shader* shader, Shader* instance);
+	Renderer(Shader& shader, Shader& instance);
 	~Renderer();
 
 	void calcTextureCoords(Entity& animate, GLfloat (*tc)[TC_SIZE]);

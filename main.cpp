@@ -56,9 +56,6 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-        float x = (float)glfwGetTime();
-        //std::cout << x << "\n";
-
         Time::current = (float)glfwGetTime();
         Time::delta = Time::current - Time::last;
 
@@ -97,7 +94,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             game._keys[key] = false;
     }
 }
-
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

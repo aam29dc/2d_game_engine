@@ -43,6 +43,7 @@ public:
 	void update();
 	void render(GLFWwindow* window, const unsigned int screen_width, const unsigned int screen_height);
 	void detectCollisions();
+	bool checkCollisions(Player& player, const unsigned int dir);
 };
 
 #endif
