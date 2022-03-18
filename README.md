@@ -1,3 +1,5 @@
+[__ (3/17/2022) Progress on PAUSE, as I continue to learn more openGL. __]
+
 # 2d_game_engine alpha 0.1 (C++/openGL)
 
 [___0.1.8___]:
