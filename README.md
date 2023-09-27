@@ -1,5 +1,5 @@
 [__ (9/27/2023) Learning SDL2 with modern C++__]
-
+Eventually I will come back to OpenGL after learning a decent amount of SDL.
 
 [__ (3/17/2022) Progress on PAUSE, as I continue to learn more openGL. __]
 
